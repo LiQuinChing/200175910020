@@ -4,6 +4,7 @@ import gov.training.dto.ApiError;
 import java.time.Instant;
 import java.util.stream.Collectors;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,6 +13,14 @@ import org.springframework.web.method.annotation.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(NominationOperationException.class)
+    public ResponseEntity<ApiError> nominationOperation(NominationOperationException ex) {
+        return error(ex.getStatus(), ex.getCode(), ex.getMessage());
+    }
+    @ExceptionHandler(DuplicateKeyException.class)
+    public ResponseEntity<ApiError> duplicateCode(DuplicateKeyException ex) {
+        return error(HttpStatus.CONFLICT, "DUPLICATE_DEPARTMENT_CODE", "A department with this code already exists.");
+    }
 
     @ExceptionHandler(DuplicateNominationException.class)
     public ResponseEntity<ApiError> duplicate(DuplicateNominationException ex) {
@@ -46,4 +55,3 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(new ApiError(Instant.now(), status.value(), code, message));
     }
 }
-

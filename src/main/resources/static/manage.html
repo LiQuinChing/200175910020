@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manage Departments &amp; Training | Government Training Management System</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/manage.js" defer></script>
+</head>
+<body>
+  <header><div class="container">
+    <h1>Government Training Management System</h1>
+    <nav aria-label="Main navigation">
+      <a href="/index.html">Submit a Nomination</a>
+      <a href="/manage.html" aria-current="page">Manage Departments &amp; Training</a>
+      <a href="/programme-participants.html">Training Programme Participants</a>
+    </nav>
+  </div></header>
+  <main class="container">
+    <h2 class="page-title">Manage Departments &amp; Training</h2>
+    <section class="card" aria-labelledby="department-title">
+      <h2 id="department-title">Create Department</h2>
+      <form id="department-form" class="management-form">
+        <div class="form-row">
+          <div><label for="department-name">Department Name</label><input id="department-name" maxlength="200" required placeholder="Finance Division"></div>
+          <div><label for="department-code">Department Code</label><input id="department-code" maxlength="30" pattern="[A-Za-z0-9_\-]+" title="Use letters, digits, underscores or hyphens." required placeholder="FIN"></div>
+        </div>
+        <button id="department-submit" type="submit">Add Department</button>
+      </form>
+      <p id="department-message" class="message" role="status" aria-live="polite" hidden></p>
+      <h3>Existing Departments</h3>
+      <p id="departments-list-message" class="hint" role="status" aria-live="polite">Loading departments...</p>
+      <div class="table-scroll" role="region" aria-label="Existing departments" tabindex="0">
+        <table>
+          <thead><tr><th scope="col">Department ID</th><th scope="col">Department Code</th><th scope="col">Department Name</th></tr></thead>
+          <tbody id="departments-body"></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="card" aria-labelledby="training-title">
+      <h2 id="training-title">Create Training Programme</h2>
+      <form id="training-form" class="management-form">
+        <label for="training-title-input">Training Title</label>
+        <input id="training-title-input" maxlength="200" required placeholder="Cyber Security Awareness Training">
+        <div class="form-row">
+          <div><label for="training-date">Training Date</label><input id="training-date" type="date" required></div>
+          <div><label for="training-venue">Venue</label><input id="training-venue" maxlength="200" required placeholder="Main Auditorium"></div>
+        </div>
+        <label for="training-capacity">Maximum Participants</label>
+        <input id="training-capacity" type="number" min="1" max="2147483647" step="1" required placeholder="75">
+        <button id="training-submit" type="submit">Create Training Programme</button>
+      </form>
+      <p id="training-message" class="message" role="status" aria-live="polite" hidden></p>
+      <h3>Existing Training Programmes</h3>
+      <p id="trainings-list-message" class="hint" role="status" aria-live="polite">Loading training programmes...</p>
+      <div class="table-scroll" role="region" aria-label="Existing training programmes" tabindex="0">
+        <table>
+          <thead><tr><th scope="col">Training ID</th><th scope="col">Title</th><th scope="col">Training Date</th><th scope="col">Venue</th><th scope="col">Maximum Participants</th><th scope="col">Update Capacity</th></tr></thead>
+          <tbody id="trainings-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <footer>Government Training Management System</footer>
+</body>
+</html>

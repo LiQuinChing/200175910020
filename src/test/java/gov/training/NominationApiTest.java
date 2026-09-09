@@ -32,9 +32,9 @@ class NominationApiTest {
                 jdbc.execute(statement.replace("ENGINE=InnoDB", ""));
             }
         }
-        jdbc.update("INSERT INTO department VALUES (10, 'Finance'), (20, 'Administration')");
-        jdbc.update("INSERT INTO officer VALUES (1001, 'Same Name'), (1002, 'Same Name')");
-        jdbc.update("INSERT INTO training_programme VALUES (101, 'Training A'), (102, 'Training B')");
+        jdbc.update("INSERT INTO department (department_id, department_name, code) VALUES (10, 'Finance', 'FIN'), (20, 'Administration', 'ADM')");
+        jdbc.update("INSERT INTO officer (officer_id, officer_name) VALUES (1001, 'Same Name'), (1002, 'Same Name')");
+        jdbc.update("INSERT INTO training_programme (training_id, training_name, max_participants) VALUES (101, 'Training A', 40), (102, 'Training B', 40)");
     }
 
     private org.springframework.test.web.servlet.ResultActions nominate(long training, long officer, long department) throws Exception {
@@ -45,7 +45,8 @@ class NominationApiTest {
     @Test void createsAndRetrieves() throws Exception {
         nominate(101, 1001, 10).andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/nominations/1"))
-                .andExpect(jsonPath("$.status").value("NOMINATED"));
+                .andExpect(jsonPath("$.status").value("CONFIRMED"))
+                .andExpect(jsonPath("$.nominationDateTime").isNotEmpty());
         mvc.perform(get("/api/nominations/1")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.officerId").value(1001))
                 .andExpect(jsonPath("$.officerName").value("Same Name"))
@@ -79,9 +80,49 @@ class NominationApiTest {
         nominate(102, 1001, 20).andExpect(status().isCreated());
     }
 
+    @Test void createsMasterDataAndUsesItForNominations() throws Exception {
+        var departmentResult = mvc.perform(post("/api/departments").contentType("application/json")
+                .content("{\"name\":\"Finance Division\",\"code\":\"fnd\"}"))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.code").value("FND"))
+                .andReturn();
+        var trainingResult = mvc.perform(post("/api/trainings").contentType("application/json")
+                .content("{\"title\":\"Cyber Security\",\"trainingDate\":\"2026-10-15\",\"venue\":\"Main Auditorium\",\"maxParticipants\":75}"))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.trainingDate").value("2026-10-15"))
+                .andExpect(jsonPath("$.maxParticipants").value(75)).andReturn();
+        var json = new com.fasterxml.jackson.databind.ObjectMapper();
+        long departmentId = json.readTree(departmentResult.getResponse().getContentAsString()).get("departmentId").asLong();
+        long trainingId = json.readTree(trainingResult.getResponse().getContentAsString()).get("trainingId").asLong();
+        mvc.perform(get("/api/departments")).andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.code == 'FND')].departmentId").value(org.hamcrest.Matchers.hasItem((int) departmentId)));
+        mvc.perform(get("/api/trainings")).andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.title == 'Cyber Security')].trainingId").value(org.hamcrest.Matchers.hasItem((int) trainingId)));
+        nominate(trainingId, 1001, departmentId).andExpect(status().isCreated())
+                .andExpect(jsonPath("$.departmentName").value("Finance Division"))
+                .andExpect(jsonPath("$.trainingName").value("Cyber Security"));
+        nominate(trainingId, 1001, 20).andExpect(status().isConflict());
+    }
+
+    @Test void validatesManagementInputAndUniqueDepartmentCodes() throws Exception {
+        mvc.perform(post("/api/departments").contentType("application/json")
+                .content("{\"name\":\"Duplicate\",\"code\":\"fin\"}"))
+                .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("DUPLICATE_DEPARTMENT_CODE"));
+        mvc.perform(post("/api/departments").contentType("application/json")
+                .content("{\"name\":\"   \",\"code\":\"NEW\"}")).andExpect(status().isBadRequest());
+        mvc.perform(post("/api/departments").contentType("application/json")
+                .content("{\"name\":\"New\",\"code\":\"bad code\"}")).andExpect(status().isBadRequest());
+        mvc.perform(post("/api/trainings").contentType("application/json")
+                .content("{\"title\":\"Training\",\"trainingDate\":\"invalid\",\"venue\":\"Room\",\"maxParticipants\":75}"))
+                .andExpect(status().isBadRequest());
+        mvc.perform(post("/api/trainings").contentType("application/json")
+                .content("{\"title\":\"Training\",\"trainingDate\":\"2026-10-15\",\"venue\":\"Room\",\"maxParticipants\":0}"))
+                .andExpect(status().isBadRequest());
+        mvc.perform(post("/api/trainings").contentType("application/json").content("{}"))
+                .andExpect(status().isBadRequest());
+    }
+
     @Test void invalidRequestsAndReferences() throws Exception {
-        nominate(101, 9999, 10).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("INVALID_REFERENCE"));
-        nominate(9999, 1001, 10).andExpect(status().isBadRequest());
+        nominate(101, 9999, 10).andExpect(status().isNotFound()).andExpect(jsonPath("$.code").value("OFFICER_NOT_FOUND"));
+        nominate(9999, 1001, 10).andExpect(status().isNotFound()).andExpect(jsonPath("$.code").value("TRAINING_NOT_FOUND"));
         nominate(101, 1001, 9999).andExpect(status().isBadRequest());
         nominate(0, 1001, 10).andExpect(status().isBadRequest());
         mvc.perform(post("/api/nominations").contentType("application/json").content("{}")).andExpect(status().isBadRequest());
@@ -109,7 +150,7 @@ class NominationApiTest {
         assertThat(repository.exists(101, 1001)).isFalse();
         barrier.await(10, TimeUnit.SECONDS);
         try {
-            repository.insert(101, 1001, department);
+            repository.insert(101, 1001, department, gov.training.model.NominationStatus.CONFIRMED);
             return true;
         } catch (DuplicateKeyException ex) { return false; }
     }

@@ -1,3 +1,2 @@
 package gov.training.model;
-public enum NominationStatus { NOMINATED, APPROVED, REJECTED, CANCELLED }
-
+public enum NominationStatus { CONFIRMED, WAITING_LIST, CANCELLED }

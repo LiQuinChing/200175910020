@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Training Programme Participants | Government Training Management System</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/programme-participants.js" defer></script>
+</head>
+<body>
+  <header><div class="container">
+    <h1>Government Training Management System</h1>
+    <nav aria-label="Main navigation">
+      <a href="/index.html">Submit a Nomination</a>
+      <a href="/manage.html">Manage Departments &amp; Training</a>
+      <a href="/programme-participants.html" aria-current="page">Training Programme Participants</a>
+    </nav>
+  </div></header>
+  <main class="container">
+    <h2 class="page-title">Training Programme Participants</h2>
+    <section class="card" aria-label="Programme selection">
+      <label for="trainingProgramme">Select Training Programme</label>
+      <select id="trainingProgramme" disabled>
+        <option value="">Loading training programmes...</option>
+      </select>
+      <p id="programme-message" class="hint" role="status" aria-live="polite">Please select a training programme to view participants.</p>
+    </section>
+    <p id="action-message" class="message" role="status" aria-live="polite" hidden></p>
+    <section id="summary-card" class="card" aria-labelledby="summary-title" hidden>
+      <h2 id="summary-title">Programme Summary</h2>
+      <p id="summary-message" class="hint" role="status" aria-live="polite"></p>
+      <div id="summary-content" hidden>
+        <p id="programme-title" class="programme-title"></p>
+        <dl class="capacity-summary">
+          <div><dt>Maximum Capacity</dt><dd id="maximum-capacity"></dd></div>
+          <div><dt>Confirmed</dt><dd id="confirmed-count"></dd></div>
+          <div><dt>Waiting List</dt><dd id="waiting-count"></dd></div>
+          <div><dt>Cancelled</dt><dd id="cancelled-count"></dd></div>
+          <div><dt>Available Seats</dt><dd id="available-seats"></dd></div>
+        </dl>
+      </div>
+    </section>
+    <section id="participants-card" class="card" aria-labelledby="participants-title" hidden>
+      <h2 id="participants-title">Participants</h2>
+      <p class="hint">Submission times are shown in your local time zone. Waiting-list promotion is automatic.</p>
+      <p id="participants-message" class="hint" role="status" aria-live="polite"></p>
+      <div class="table-scroll" role="region" aria-label="Programme participants" tabindex="0">
+        <table class="participants-table">
+          <thead><tr>
+            <th scope="col">Nomination ID</th><th scope="col">Officer ID</th>
+            <th scope="col">Officer Name</th><th scope="col">Department</th>
+            <th scope="col">Nomination Date/Time</th><th scope="col">Status</th><th scope="col">Action</th>
+          </tr></thead>
+          <tbody id="participants-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <footer>Government Training Management System</footer>
+</body>
+</html>
+

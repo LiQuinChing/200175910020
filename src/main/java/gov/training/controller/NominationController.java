@@ -25,6 +25,11 @@ public class NominationController {
     @GetMapping("/{id}")
     public TrainingNomination get(@PathVariable @Positive long id) { return service.get(id); }
 
+    @PutMapping("/{nominationId}/cancel")
+    public TrainingNomination cancel(@PathVariable @Positive long nominationId) {
+        return service.cancel(nominationId);
+    }
+
     @GetMapping
     public List<TrainingNomination> list(@RequestParam(required = false) @Positive Long trainingId,
             @RequestParam(defaultValue = "50") @Min(1) @Max(200) int limit,
@@ -32,4 +37,3 @@ public class NominationController {
         return service.list(trainingId, limit, offset);
     }
 }
-

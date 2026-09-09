@@ -20,7 +20,7 @@ public class NominationRepository {
             """;
     private static final RowMapper<TrainingNomination> MAPPER = (rs, row) -> new TrainingNomination(
             rs.getLong("nomination_id"), rs.getLong("training_id"), rs.getLong("officer_id"),
-            rs.getLong("nominated_by_department_id"), rs.getTimestamp("nomination_date").toInstant(),
+            rs.getLong("nominated_by_department_id"), rs.getTimestamp("nomination_datetime").toInstant(),
             NominationStatus.valueOf(rs.getString("status")), rs.getString("officer_name"),
             rs.getString("training_name"), rs.getString("department_name"));
 
@@ -32,15 +32,16 @@ public class NominationRepository {
                 Boolean.class, trainingId, officerId));
     }
 
-    public TrainingNomination insert(long trainingId, long officerId, long departmentId) {
+    public TrainingNomination insert(long trainingId, long officerId, long departmentId, NominationStatus status) {
         var keys = new GeneratedKeyHolder();
         jdbc.update(connection -> {
             var statement = connection.prepareStatement(
-                    "INSERT INTO training_nomination (training_id, officer_id, nominated_by_department_id, status) VALUES (?, ?, ?, 'NOMINATED')",
+                    "INSERT INTO training_nomination (training_id, officer_id, nominated_by_department_id, status) VALUES (?, ?, ?, ?)",
                     new String[] { "nomination_id" });
             statement.setLong(1, trainingId);
             statement.setLong(2, officerId);
             statement.setLong(3, departmentId);
+            statement.setString(4, status.name());
             return statement;
         }, keys);
         Number key = keys.getKey();
@@ -51,6 +52,48 @@ public class NominationRepository {
     public Optional<TrainingNomination> findById(long id) {
         return jdbc.query(SELECT + " WHERE n.nomination_id = ?", MAPPER, id)
                 .stream().findFirst();
+    }
+
+    public long countConfirmedByTraining(long trainingId) {
+        return jdbc.queryForObject(
+                "SELECT COUNT(*) FROM training_nomination WHERE training_id = ? AND status = 'CONFIRMED'",
+                Long.class, trainingId);
+    }
+
+    public int updateStatus(long nominationId, NominationStatus expected, NominationStatus status) {
+        return jdbc.update("UPDATE training_nomination SET status = ? WHERE nomination_id = ? AND status = ?",
+                status.name(), nominationId, expected.name());
+    }
+
+    public Optional<Long> findFirstWaitingNomination(long trainingId) {
+        return jdbc.query("""
+                SELECT nomination_id FROM training_nomination
+                WHERE training_id = ? AND status = 'WAITING_LIST'
+                ORDER BY nomination_datetime ASC, nomination_id ASC LIMIT 1 FOR UPDATE
+                """, (rs, row) -> rs.getLong("nomination_id"), trainingId).stream().findFirst();
+    }
+
+    public List<TrainingNomination> findNominationsByTraining(long trainingId) {
+        return jdbc.query(SELECT + """
+                 WHERE n.training_id = ?
+                 ORDER BY CASE n.status WHEN 'CONFIRMED' THEN 0 WHEN 'WAITING_LIST' THEN 1 ELSE 2 END,
+                 n.nomination_datetime ASC, n.nomination_id ASC
+                """, MAPPER, trainingId);
+    }
+
+    public gov.training.dto.TrainingCapacitySummaryDTO getCapacitySummary(gov.training.model.TrainingProgramme training) {
+        return jdbc.queryForObject("""
+                SELECT COUNT(CASE WHEN status = 'CONFIRMED' THEN 1 END) AS confirmed_count,
+                       COUNT(CASE WHEN status = 'WAITING_LIST' THEN 1 END) AS waiting_count,
+                       COUNT(CASE WHEN status = 'CANCELLED' THEN 1 END) AS cancelled_count
+                FROM training_nomination WHERE training_id = ?
+                """, (rs, row) -> {
+                    long confirmed = rs.getLong("confirmed_count");
+                    return new gov.training.dto.TrainingCapacitySummaryDTO(
+                            training.trainingId(), training.title(), training.maxParticipants(), confirmed,
+                            rs.getLong("waiting_count"), rs.getLong("cancelled_count"),
+                            Math.max(0L, training.maxParticipants() - confirmed));
+                }, training.trainingId());
     }
 
     public List<TrainingNomination> findAll(Long trainingId, int limit, int offset) {
