@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Government Training Management System</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header><div class="container"><p class="eyebrow">Training nominations</p><h1>Government Training Management System</h1></div></header>
+  <main class="container">
+    <section class="card form-card" aria-labelledby="form-title">
+      <h2 id="form-title">Submit a nomination</h2>
+      <p class="hint">An officer can be nominated only once for each training programme, across all departments.</p>
+      <form id="nomination-form">
+        <label for="training">Training Programme</label>
+        <select id="training" required>
+          <option value="">Select a training programme</option>
+          <option value="101">Public Administration</option>
+          <option value="102">Procurement</option>
+        </select>
+        <div class="form-row">
+          <div><label for="officer-id">Officer ID</label><input id="officer-id" type="number" min="1" max="9007199254740991" step="1" placeholder="e.g. 1001" required aria-describedby="officer-help"></div>
+          <div><label for="officer-name">Officer Name (optional)</label><input id="officer-name" type="text" maxlength="200" placeholder="For your reference only" aria-describedby="officer-help"></div>
+        </div>
+        <p id="officer-help" class="hint">Only Officer ID is submitted. The table shows the officer’s registered name.</p>
+        <label for="department">Department</label>
+        <select id="department" required>
+          <option value="">Select a department</option>
+          <option value="10">Finance</option>
+          <option value="20">Administration</option>
+        </select>
+        <button id="submit-button" type="submit">Submit Nomination</button>
+      </form>
+      <p id="form-message" class="message" role="status" aria-live="polite" hidden></p>
+      <p class="demo-note">Demo: load sample-data.sql and use Officer ID 1001 or 1002. Submit the same officer and programme from another department to see duplicate prevention.</p>
+    </section>
+    <section class="card" aria-labelledby="list-title">
+      <h2 id="list-title">Existing nominations</h2>
+      <p id="list-message" class="hint" role="status" aria-live="polite">Loading nominations…</p>
+      <div class="table-scroll" role="region" aria-label="Existing nominations" tabindex="0">
+        <table>
+          <thead><tr><th scope="col">Officer ID</th><th scope="col">Officer Name</th><th scope="col">Training Programme</th><th scope="col">Department</th><th scope="col">Status</th></tr></thead>
+          <tbody id="nominations-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <footer>Government Training Management System · Training nominations</footer>
+</body>
+</html>
+
