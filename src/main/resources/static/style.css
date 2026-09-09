@@ -59,3 +59,50 @@ footer { text-align: center; padding: 0 16px 24px; color: #586575; font-size: .8
   button { width: 100%; }
   table { min-width: 620px; }
 }
+
+/* Task 3 - Eligibility */
+
+.info-card {
+  background: #fffbea;
+  border-color: #dfcf8d;
+}
+
+.info-card h2 {
+  color: #5f4b10;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.checkbox-label input {
+  width: auto;
+  min-height: auto;
+}
+
+.eligibility-check-box {
+  margin: 16px 0;
+}
+
+.eligibility-check-box button {
+  margin-top: 0;
+}
+
+.small-danger-button {
+  margin: 0;
+  padding: 7px 10px;
+  min-height: 36px;
+  background: #a32121;
+  font-size: 0.82rem;
+}
+
+.small-danger-button:hover {
+  background: #821b1b;
+}
+
+#eligibility-rules-body td {
+  vertical-align: middle;
+}

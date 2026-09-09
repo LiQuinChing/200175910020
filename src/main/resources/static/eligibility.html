@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Training Eligibility | Government Training Management System</title>
+
+  <link rel="stylesheet" href="/style.css">
+  <script src="/eligibility.js" defer></script>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+
+    <h1>Government Training Management System</h1>
+
+    <nav aria-label="Main navigation">
+      <a href="/index.html">Submit a Nomination</a>
+
+      <a href="/manage.html">
+        Manage Departments &amp; Training
+      </a>
+
+      <a href="/programme-participants.html">
+        Training Programme Participants
+      </a>
+
+      <a href="/eligibility.html" aria-current="page">
+        Training Eligibility
+      </a>
+    </nav>
+
+  </div>
+</header>
+
+
+<main class="container">
+
+  <h2 class="page-title">
+    Training Eligibility Rules
+  </h2>
+
+
+  <!-- TRAINING SELECTION -->
+
+  <section class="card">
+
+    <label for="eligibility-training">
+      Select Training Programme
+    </label>
+
+    <select id="eligibility-training" disabled>
+
+      <option value="">
+        Loading training programmes...
+      </option>
+
+    </select>
+
+    <p
+      id="training-rule-message"
+      class="hint"
+      role="status">
+      Select a training programme to configure eligibility rules.
+    </p>
+
+  </section>
+
+
+
+  <!-- ADD RULE -->
+
+  <section
+    id="rule-form-card"
+    class="card"
+    hidden>
+
+    <h2>
+      Add Eligibility Rule
+    </h2>
+
+    <form id="eligibility-rule-form">
+
+      <label for="rule-type">
+        Rule Type
+      </label>
+
+      <select id="rule-type" required>
+
+        <option value="">
+          Select rule type
+        </option>
+
+        <option value="DEPARTMENT">
+          Department
+        </option>
+
+        <option value="DESIGNATION">
+          Designation
+        </option>
+
+        <option value="GRADE">
+          Grade
+        </option>
+
+        <option value="MIN_YEARS_OF_SERVICE">
+          Minimum Years of Service
+        </option>
+
+        <option value="NO_SAME_TRAINING_WITHIN_MONTHS">
+          No Same Training Within Months
+        </option>
+
+      </select>
+
+
+      <label for="rule-operator">
+        Operator
+      </label>
+
+      <select id="rule-operator" required disabled>
+
+        <option value="">
+          Select rule type first
+        </option>
+
+      </select>
+
+
+      <div id="normal-value-container">
+
+        <label for="rule-value">
+          Rule Value
+        </label>
+
+        <input
+          id="rule-value"
+          type="text"
+          maxlength="255"
+          placeholder="Enter value">
+
+      </div>
+
+
+      <div id="department-value-container" hidden>
+
+        <label for="department-rule-value">
+          Department
+        </label>
+
+        <select id="department-rule-value">
+
+          <option value="">
+            Select department
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <label class="checkbox-label">
+
+        <input
+          id="rule-active"
+          type="checkbox"
+          checked>
+
+        Active Rule
+
+      </label>
+
+
+      <button
+        id="rule-submit-button"
+        type="submit">
+
+        Add Rule
+
+      </button>
+
+    </form>
+
+
+    <p
+      id="rule-form-message"
+      class="message"
+      role="status"
+      aria-live="polite"
+      hidden>
+    </p>
+
+  </section>
+
+
+
+  <!-- EXISTING RULES -->
+
+  <section
+    id="rules-card"
+    class="card"
+    hidden>
+
+    <h2>
+      Current Eligibility Rules
+    </h2>
+
+    <p
+      id="rules-message"
+      class="hint">
+      Loading rules...
+    </p>
+
+
+    <div
+      class="table-scroll"
+      role="region"
+      aria-label="Eligibility rules"
+      tabindex="0">
+
+      <table>
+
+        <thead>
+          <tr>
+
+            <th>Rule ID</th>
+
+            <th>Rule Type</th>
+
+            <th>Condition</th>
+
+            <th>Value</th>
+
+            <th>Active</th>
+
+            <th>Action</th>
+
+          </tr>
+        </thead>
+
+        <tbody id="eligibility-rules-body">
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- RULE EXPLANATION -->
+
+  <section class="card info-card">
+
+    <h2>
+      How eligibility rules work
+    </h2>
+
+    <p>
+      Rules of the same type are treated as alternatives.
+    </p>
+
+    <p>
+      Example:
+    </p>
+
+    <p>
+      <strong>Department:</strong>
+      Finance OR Budget OR Planning
+    </p>
+
+    <p>
+      <strong>AND</strong>
+    </p>
+
+    <p>
+      <strong>Minimum Years of Service:</strong>
+      5 or more
+    </p>
+
+    <p class="hint">
+      The officer must satisfy each required rule category before
+      the nomination can continue to capacity allocation.
+    </p>
+
+  </section>
+
+</main>
+
+
+<footer>
+  Government Training Management System
+</footer>
+
+</body>
+</html>

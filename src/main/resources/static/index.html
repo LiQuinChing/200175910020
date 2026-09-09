@@ -11,10 +11,26 @@
   <header><div class="container">
     <h1>Government Training Management System</h1>
     <nav aria-label="Main navigation">
-      <a href="/index.html" aria-current="page">Submit a Nomination</a>
-      <a href="/manage.html">Manage Departments &amp; Training</a>
-      <a href="/programme-participants.html">Training Programme Participants</a>
-    </nav>
+
+  <a
+    href="/index.html"
+    aria-current="page">
+    Submit a Nomination
+  </a>
+
+  <a href="/manage.html">
+    Manage Departments &amp; Training
+  </a>
+
+  <a href="/programme-participants.html">
+    Training Programme Participants
+  </a>
+
+  <a href="/eligibility.html">
+    Training Eligibility
+  </a>
+
+</nav>
   </div></header>
   <main class="container">
     <section class="card form-card" aria-labelledby="form-title">
@@ -32,6 +48,25 @@
           <div><label for="officer-name">Officer Name (optional)</label><input id="officer-name" type="text" maxlength="200" placeholder="For your reference only" aria-describedby="officer-help"></div>
         </div>
         <p id="officer-help" class="hint">Only Officer ID is submitted. The table shows the officer’s registered name.</p>
+        <div class="eligibility-check-box">
+
+  <button
+    id="check-eligibility-button"
+    type="button">
+
+    Check Eligibility
+
+  </button>
+
+  <p
+    id="eligibility-message"
+    class="message"
+    role="status"
+    aria-live="polite"
+    hidden>
+  </p>
+
+</div>
         <label for="departmentId">Department</label>
         <select id="departmentId" required disabled aria-describedby="department-message">
           <option value="">Loading departments...</option>
