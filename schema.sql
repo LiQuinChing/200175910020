@@ -13,6 +13,8 @@ CREATE TABLE officer (
     officer_name VARCHAR(200) NOT NULL,
     department_id BIGINT,
     designation VARCHAR(200),
+    grade VARCHAR(100),
+    date_of_joining DATE,
     email VARCHAR(254),
     CONSTRAINT fk_officer_department FOREIGN KEY (department_id) REFERENCES department(department_id)
 ) ENGINE=InnoDB;
@@ -39,4 +41,15 @@ CREATE TABLE training_nomination (
     CONSTRAINT fk_nomination_officer FOREIGN KEY (officer_id) REFERENCES officer(officer_id),
     CONSTRAINT fk_nomination_department FOREIGN KEY (nominated_by_department_id) REFERENCES department(department_id),
     CONSTRAINT chk_nomination_status CHECK (status IN ('CONFIRMED', 'WAITING_LIST', 'CANCELLED'))
+) ENGINE=InnoDB;
+
+CREATE TABLE training_eligibility_rule (
+    rule_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    training_id BIGINT NOT NULL,
+    rule_type VARCHAR(50) NOT NULL,
+    `operator` VARCHAR(20) NOT NULL,
+    rule_value VARCHAR(255) NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    KEY idx_eligibility_training (training_id),
+    CONSTRAINT fk_eligibility_training FOREIGN KEY (training_id) REFERENCES training_programme(training_id)
 ) ENGINE=InnoDB;

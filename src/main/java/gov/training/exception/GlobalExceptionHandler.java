@@ -1,6 +1,7 @@
 package gov.training.exception;
 
 import gov.training.dto.ApiError;
+import gov.training.dto.EligibilityError;
 import java.time.Instant;
 import java.util.stream.Collectors;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -13,6 +14,11 @@ import org.springframework.web.method.annotation.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(EligibilityException.class)
+    public ResponseEntity<EligibilityError> eligibility(EligibilityException ex) {
+        return ResponseEntity.badRequest().body(new EligibilityError(Instant.now(), 400,
+                "OFFICER_NOT_ELIGIBLE", ex.getMessage(), ex.getReasons()));
+    }
     @ExceptionHandler(NominationOperationException.class)
     public ResponseEntity<ApiError> nominationOperation(NominationOperationException ex) {
         return error(ex.getStatus(), ex.getCode(), ex.getMessage());

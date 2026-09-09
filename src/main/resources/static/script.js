@@ -185,7 +185,8 @@ async function submitNomination(event) {
       await Promise.all([loadNominations(), loadSelectedCapacity()]);
     } else if (response.status === 400 || response.status === 404) {
       const error = await response.json().catch(() => ({}));
-      showMessage(formMessage, error.message || "Invalid input. Check the selected programme, Officer ID and department.", "error");
+      const reasons = Array.isArray(error.reasons) ? " " + error.reasons.join(" ") : "";
+      showMessage(formMessage, (error.message || "Invalid input. Check the selected programme, Officer ID and department.") + reasons, "error");
     } else {
       showMessage(formMessage, "The server could not process the nomination. Please try again later.", "error");
     }

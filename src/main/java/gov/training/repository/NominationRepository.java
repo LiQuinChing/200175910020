@@ -26,6 +26,20 @@ public class NominationRepository {
 
     public NominationRepository(JdbcTemplate jdbc) { this.jdbc = jdbc; }
 
+    public boolean hasParticipationSince(long trainingId, long officerId, java.time.LocalDate since, java.time.LocalDate today) {
+        // CONFIRMED is the current participation proxy. Use the programme date when
+        // available; otherwise use the historical nomination date. Future events do not count.
+        return Boolean.TRUE.equals(jdbc.queryForObject("""
+                SELECT EXISTS(
+                    SELECT 1 FROM training_nomination n
+                    JOIN training_programme t ON t.training_id = n.training_id
+                    WHERE n.training_id = ? AND n.officer_id = ?
+                      AND n.status = 'CONFIRMED'
+                      AND COALESCE(t.training_date, CAST(n.nomination_datetime AS DATE)) BETWEEN ? AND ?
+                )
+                """, Boolean.class, trainingId, officerId, java.sql.Date.valueOf(since), java.sql.Date.valueOf(today)));
+    }
+
     public boolean exists(long trainingId, long officerId) {
         return Boolean.TRUE.equals(jdbc.queryForObject(
                 "SELECT EXISTS(SELECT 1 FROM training_nomination WHERE training_id = ? AND officer_id = ?)",

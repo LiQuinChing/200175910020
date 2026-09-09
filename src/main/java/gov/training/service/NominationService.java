@@ -17,23 +17,28 @@ public class NominationService {
     private final NominationRepository repository;
     private final TrainingRepository trainings;
     private final OfficerRepository officers;
-    public NominationService(NominationRepository repository, TrainingRepository trainings, OfficerRepository officers) {
+    private final EligibilityService eligibility;
+    public NominationService(NominationRepository repository, TrainingRepository trainings, OfficerRepository officers,
+            EligibilityService eligibility) {
         this.repository = repository;
         this.trainings = trainings;
         this.officers = officers;
+        this.eligibility = eligibility;
     }
 
     // All seat-changing operations acquire this same parent-row lock first.
     // READ_COMMITTED ensures the count sees the previous lock holder's committed insert.
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public TrainingNomination create(CreateNominationRequest request) {
-        TrainingProgramme training = lockTraining(request.trainingId());
         if (!officers.exists(request.officerId())) {
             throw new NominationOperationException(HttpStatus.NOT_FOUND, "OFFICER_NOT_FOUND", "Officer was not found.");
         }
+        TrainingProgramme training = lockTraining(request.trainingId());
         if (repository.exists(request.trainingId(), request.officerId())) {
             throw new DuplicateNominationException();
         }
+        var result = eligibility.checkEligibility(request.trainingId(), request.officerId());
+        if (!result.eligible()) throw new EligibilityException(result.reasons());
         int capacity = requireCapacity(training);
         NominationStatus status = repository.countConfirmedByTraining(training.trainingId()) < capacity
                 ? NominationStatus.CONFIRMED : NominationStatus.WAITING_LIST;
