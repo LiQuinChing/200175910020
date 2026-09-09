@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: gov.training.NominationApiTest
+-------------------------------------------------------------------------------
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.828 s -- in gov.training.NominationApiTest
